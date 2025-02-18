@@ -1,0 +1,28 @@
+### Inscription
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "pin": "1234",
+  "faceIdEnabled": true
+}
+
+### Connexion avec PIN
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "pin": "1234",
+  "faceIdUsed": false
+}
+
+### Connexion avec Face ID
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "faceIdUsed": true
+}
