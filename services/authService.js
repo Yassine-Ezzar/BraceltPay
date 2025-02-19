@@ -1,23 +1,48 @@
 const User = require("../models/User");
 const generateToken = require("../utils/generateToken");
 
-const registerUser = async (email, pin, faceIdEnabled) => {
-  const userExists = await User.findOne({ email });
-  if (userExists) throw new Error("Utilisateur déjà enregistré");
+const register = async (pin, faceId, touchId) => {
+  const user = new User({
+    pin,
+    faceIdEnabled: faceId,
+    touchIdEnabled: touchId,
+  });
 
-  const user = await User.create({ email, pin, faceIdEnabled });
-  return { userId: user._id, token: generateToken(user._id) };
+  await user.save();
+  return { user, token: generateToken(user._id) };
 };
 
-const loginUser = async (email, pin, faceIdUsed) => {
-  const user = await User.findOne({ email });
+const login = async (pin, faceId, touchId) => {
+  const user = await User.findOne();
   if (!user) throw new Error("Utilisateur non trouvé");
 
-  if (faceIdUsed && !user.faceIdEnabled) throw new Error("Face ID non activé");
+  // Connexion avec Code PIN
+  if (pin && !(await user.comparePin(pin))) {
+    throw new Error("Code PIN incorrect");
+  }
 
-  if (!faceIdUsed && !(await user.matchPin(pin))) throw new Error("Code PIN incorrect");
+  // Connexion avec Face ID
+  if (faceId && !user.faceIdEnabled) {
+    throw new Error("Face ID non activé pour cet utilisateur");
+  }
 
-  return { userId: user._id, token: generateToken(user._id) };
+  // Connexion avec Touch ID
+  if (touchId && !user.touchIdEnabled) {
+    throw new Error("Touch ID non activé pour cet utilisateur");
+  }
+
+  return { user, token: generateToken(user._id) };
 };
 
-module.exports = { registerUser, loginUser };
+// Suppression du compte utilisateur
+const deleteUser = async (userId) => {
+  await User.findByIdAndDelete(userId);
+};
+
+// Récupérer tous les utilisateurs
+const getAllUsers = async () => {
+  return await User.find();
+};
+
+
+module.exports = { register, login,deleteUser,getAllUsers };

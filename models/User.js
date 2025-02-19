@@ -1,24 +1,18 @@
-const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const UserSchema = new mongoose.Schema({
-  email: { type: String, required: true, unique: true },
-  pin: { type: String, required: false }, // Stocké en hash
-  faceIdEnabled: { type: Boolean, default: false }, // Face ID / Touch ID activé ?
+    pinCode: { type: String, required: true },
+    faceIdEnabled: { type: Boolean, default: false },
+    touchIdEnabled: { type: Boolean, default: false },
+    securityQuestion: { type: String, required: true },
+    securityAnswer: { type: String, required: true }
 });
 
-// Hash du PIN avant sauvegarde
-UserSchema.pre("save", async function (next) {
-  if (!this.isModified("pin")) return next();
-  const salt = await bcrypt.genSalt(10);
-  this.pin = await bcrypt.hash(this.pin, salt);
-  next();
+UserSchema.pre('save', async function(next) {
+    if (!this.isModified('pinCode')) return next();
+    this.pinCode = await bcrypt.hash(this.pinCode, 10);
+    next();
 });
 
-// Vérification du PIN
-UserSchema.methods.matchPin = async function (enteredPin) {
-  return await bcrypt.compare(enteredPin, this.pin);
-};
-
-const User = mongoose.model("User", UserSchema);
-module.exports = User;
+module.exports = mongoose.model('User', UserSchema);

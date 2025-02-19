@@ -1,28 +1,52 @@
-### Inscription
+### Register
 POST http://localhost:3000/api/auth/register
 Content-Type: application/json
 
 {
-  "email": "test@example.com",
-  "pin": "1234",
-  "faceIdEnabled": true
+    "pinCode": "1234",
+    "faceIdEnabled": true,
+    "touchIdEnabled": true,
+    "securityQuestion": "Quel est le nom de votre premier animal ?",
+    "securityAnswer": "Rex"
 }
 
-### Connexion avec PIN
+### Login with PIN
 POST http://localhost:3000/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "test@example.com",
-  "pin": "1234",
-  "faceIdUsed": false
+    "pinCode": "1234"
 }
 
-### Connexion avec Face ID
+### Login with Face ID / Touch ID
 POST http://localhost:3000/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "test@example.com",
-  "faceIdUsed": true
+    "faceId": true
 }
+
+### Reset PIN with Security Question
+POST http://localhost:3000/api/auth/reset-pin
+Content-Type: application/json
+
+{
+    "securityQuestion": "Quel est le nom de votre premier animal ?",
+    "securityAnswer": "Rex",
+    "newPin": "5678"
+}
+
+### Reset PIN with Face ID / Touch ID
+POST http://localhost:3000/api/auth/reset-pin
+Content-Type: application/json
+
+{
+    "faceId": true,
+    "newPin": "5678"
+}
+
+### Get all users
+GET http://localhost:3000/api/auth/users
+
+### Delete a user
+DELETE http://localhost:3000/api/auth/delete/{userId}
