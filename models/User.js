@@ -1,18 +1,11 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const mongoose = require("mongoose");
 
-const UserSchema = new mongoose.Schema({
-    pinCode: { type: String, required: true },
-    faceIdEnabled: { type: Boolean, default: false },
-    touchIdEnabled: { type: Boolean, default: false },
-    securityQuestion: { type: String, required: true },
-    securityAnswer: { type: String, required: true }
+const userSchema = new mongoose.Schema({
+  pin: { type: String, required: false }, // PIN sécurisé avec bcrypt
+  faceIdEnabled: { type: Boolean, default: false }, // Activer Face ID / Touch ID
+  touchIdEnabled: { type: Boolean, default: false }, // Activer Touch ID
+  securityQuestion: { type: String, required: false }, // Question de sécurité
+  securityAnswer: { type: String, required: false }, // Réponse hachée
 });
 
-UserSchema.pre('save', async function(next) {
-    if (!this.isModified('pinCode')) return next();
-    this.pinCode = await bcrypt.hash(this.pinCode, 10);
-    next();
-});
-
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model("User", userSchema);

@@ -1,52 +1,53 @@
-### Register
+### Inscription avec PIN
 POST http://localhost:3000/api/auth/register
 Content-Type: application/json
 
 {
-    "pinCode": "1234",
-    "faceIdEnabled": true,
-    "touchIdEnabled": true,
-    "securityQuestion": "Quel est le nom de votre premier animal ?",
-    "securityAnswer": "Rex"
+  "pin": "1234",
+  "securityQuestion": "Quel est le nom de votre premier animal ?",
+  "securityAnswer": "Rex",
+  "faceIdEnabled": true,
+  "touchIdEnabled": false
 }
 
-### Login with PIN
+### Connexion avec PIN
 POST http://localhost:3000/api/auth/login
 Content-Type: application/json
 
 {
-    "pinCode": "1234"
+  "pin": "1234"
 }
 
-### Login with Face ID / Touch ID
+### Connexion avec Face ID
 POST http://localhost:3000/api/auth/login
 Content-Type: application/json
 
 {
-    "faceId": true
+  "biometricType": "FaceID"
 }
 
-### Reset PIN with Security Question
-POST http://localhost:3000/api/auth/reset-pin
+### Réinitialisation du PIN avec la question de sécurité
+POST http://localhost:3000/api/auth/reset-pin/security-question
 Content-Type: application/json
 
 {
-    "securityQuestion": "Quel est le nom de votre premier animal ?",
-    "securityAnswer": "Rex",
-    "newPin": "5678"
+  "userId": "USER_ID_HERE",
+  "securityAnswer": "Rex",
+  "newPin": "5678"
 }
 
-### Reset PIN with Face ID / Touch ID
-POST http://localhost:3000/api/auth/reset-pin
+### Réinitialisation du PIN avec Face ID
+POST http://localhost:3000/api/auth/reset-pin/biometrics
 Content-Type: application/json
 
 {
-    "faceId": true,
-    "newPin": "5678"
+  "userId": "USER_ID_HERE",
+  "biometricType": "FaceID",
+  "newPin": "5678"
 }
 
-### Get all users
+### Récupérer tous les utilisateurs
 GET http://localhost:3000/api/auth/users
 
-### Delete a user
-DELETE http://localhost:3000/api/auth/delete/{userId}
+### Supprimer un utilisateur
+DELETE http://localhost:3000/api/auth/users/USER_ID_HERE
