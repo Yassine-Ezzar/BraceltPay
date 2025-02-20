@@ -3,7 +3,7 @@ POST http://localhost:3000/api/auth/register
 Content-Type: application/json
 
 {
-  "pin": "1234",
+  "pinCode": "1234",
   "securityQuestion": "Quel est le nom de votre premier animal ?",
   "securityAnswer": "Rex",
   "faceIdEnabled": true,
@@ -51,3 +51,21 @@ GET http://localhost:3000/api/auth/users
 
 ### Supprimer un utilisateur
 DELETE http://localhost:3000/api/auth/users/USER_ID_HERE
+
+********************************************************************************
+### Ajouter une carte
+POST http://localhost:3000/api/wallet/add-card
+Content-Type: application/json
+
+{
+  "cardNumber": "1234567812345678",
+  "expiryDate": "12/26",
+  "cvv": "123",
+  "cardholderName": "John Doe"
+}
+
+### Récupérer toutes les cartes
+GET http://localhost:3000/api/wallet/cards
+
+### Supprimer une carte
+DELETE http://localhost:3000/api/wallet/delete-card/{id}

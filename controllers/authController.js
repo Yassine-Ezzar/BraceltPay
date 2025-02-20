@@ -2,26 +2,21 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-// Inscription avec PIN / Face ID / Touch ID
 exports.register = async (req, res) => {
   try {
-    const { pin, securityQuestion, securityAnswer, faceIdEnabled, touchIdEnabled } = req.body;
+      const { pinCode, securityQuestion, securityAnswer, faceIdEnabled, touchIdEnabled } = req.body;
+      
+      const newUser = await User.create({
+          pinCode,
+          securityQuestion,
+          securityAnswer,
+          faceIdEnabled,
+          touchIdEnabled
+      });
 
-    // Hacher le PIN et la réponse de sécurité
-    const hashedPin = await bcrypt.hash(pin, 10);
-    const hashedAnswer = await bcrypt.hash(securityAnswer.toLowerCase(), 10);
-
-    const user = await User.create({
-      pin: hashedPin,
-      securityQuestion,
-      securityAnswer: hashedAnswer,
-      faceIdEnabled,
-      touchIdEnabled,
-    });
-
-    res.status(201).json({ message: "Utilisateur créé avec succès" });
+      res.status(201).json({ message: 'Utilisateur inscrit avec succès', user: newUser });
   } catch (error) {
-    res.status(500).json({ message: "Erreur lors de l'inscription", error: error.message });
+      res.status(500).json({ message: "Erreur lors de l'inscription", error: error.message });
   }
 };
 

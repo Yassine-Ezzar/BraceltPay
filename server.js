@@ -1,11 +1,11 @@
 require("dotenv").config();
-const express = require("express");
+const express = require('express');
+const mongoose = require('mongoose');
 const cors = require("cors");
-const mongoose = require("mongoose");
 const morgan = require("morgan");
 const helmet = require("helmet");
 const authRoutes = require("./routes/authRoutes");
-
+const walletRoutes = require('./routes/walletRoutes');
 const app = express();
 
 // Middlewares
@@ -16,7 +16,7 @@ app.use(morgan("dev"));
 
 // Routes
 app.use("/api/auth", authRoutes);
-
+app.use('/api/wallet', walletRoutes);
 // Connexion MongoDB
 mongoose.connect(process.env.MONGO_URI).then(() => console.log("MongoDB connecté ✅")).catch(err => console.error(err));
 
