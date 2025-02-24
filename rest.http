@@ -95,3 +95,15 @@ Content-Type: application/json
 
 ### Consulter l’historique des transactions
 GET http://localhost:3000/payments/history?userId=USER_ID_TEST
+### Mettre à jour la localisation
+POST http://localhost:3000/location/update
+Content-Type: application/json
+
+{
+  "userId": "USER_ID_TEST",
+  "latitude": 48.8566,
+  "longitude": 2.3522
+}
+
+### Obtenir la localisation
+GET http://localhost:3000/location/get?userId=USER_ID_TEST
