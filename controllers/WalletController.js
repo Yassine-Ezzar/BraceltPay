@@ -28,3 +28,14 @@ exports.deleteCard = async (req, res) => {
         res.status(500).json({ message: 'Error deleting card', error });
     }
 };
+
+
+exports.scanCard = async (req, res) => {
+    try {
+      const { image } = req.body;
+      const cardInfo = await extractCardInfo(image); 
+      res.status(200).json({ message: 'Card scanned successfully', cardInfo });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };

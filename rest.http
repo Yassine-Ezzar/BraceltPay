@@ -69,3 +69,29 @@ GET http://localhost:3000/api/wallet/cards
 
 ### Supprimer une carte
 DELETE http://localhost:3000/api/wallet/delete-card/{id}
+
+### Get Transaction History
+GET http://localhost:3000/api/transactions/history
+
+### Scanner une carte (Simulation OCR)
+POST http://localhost:3000/cards/scan
+Content-Type: application/json
+
+{
+  "image": "base64_encoded_image_here"
+}
+
+### Effectuer un paiement
+POST http://localhost:3000/payments/transaction
+Content-Type: application/json
+
+{
+  "userId": "USER_ID_TEST",
+  "cardId": "CARD_ID_TEST",
+  "amount": 50.00,
+  "currency": "EUR",
+  "merchant": "Amazon"
+}
+
+### Consulter l’historique des transactions
+GET http://localhost:3000/payments/history?userId=USER_ID_TEST

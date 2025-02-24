@@ -6,6 +6,8 @@ const morgan = require("morgan");
 const helmet = require("helmet");
 const authRoutes = require("./routes/authRoutes");
 const walletRoutes = require('./routes/walletRoutes');
+const transactionRoutes = require('./routes/transactionRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 const app = express();
 
 // Middlewares
@@ -17,6 +19,8 @@ app.use(morgan("dev"));
 // Routes
 app.use("/api/auth", authRoutes);
 app.use('/api/wallet', walletRoutes);
+app.use('/api/transactions', transactionRoutes);
+app.use('/payments', paymentRoutes);
 // Connexion MongoDB
 mongoose.connect(process.env.MONGO_URI).then(() => console.log("MongoDB connecté ✅")).catch(err => console.error(err));
 
