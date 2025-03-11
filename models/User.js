@@ -1,12 +1,24 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
-    pinCode: { type: String, required: true },
-    securityQuestion: { type: String, required: false },
-    securityAnswer: { type: String, required: false },
-    faceIdEnabled: { type: Boolean, default: false },
-    touchIdEnabled: { type: Boolean, default: false }
+  name: { type: String, required: true, unique: true },
+  pin: { type: String, required: true },
+  securityQuestion: { type: String, default: "Quel est le nom de votre animal ?" },
+  securityAnswer: { type: String, required: true },
+  biometricEnabled: { type: Boolean, default: false },
+  cards: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Card' }], 
+  createdAt: { type: Date, default: Date.now },
 });
 
-const User = mongoose.model('User', userSchema);
-module.exports = User;
+userSchema.pre('save', async function(next) {
+  if (this.isModified('pin')) {
+    this.pin = await bcrypt.hash(this.pin, 10);
+  }
+  if (this.isModified('securityAnswer')) {
+    this.securityAnswer = await bcrypt.hash(this.securityAnswer, 10);
+  }
+  next();
+});
+
+module.exports = mongoose.model('User', userSchema);

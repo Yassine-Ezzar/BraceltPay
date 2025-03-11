@@ -1,133 +1,64 @@
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
+const User = require('../models/User');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const jwtConfig = require('../config/config');
 
 exports.register = async (req, res) => {
-  try {
-      const { pinCode, securityQuestion, securityAnswer, faceIdEnabled, touchIdEnabled } = req.body;
-      
-      const newUser = await User.create({
-          pinCode,
-          securityQuestion,
-          securityAnswer,
-          faceIdEnabled,
-          touchIdEnabled
-      });
+  const { name, pin, securityAnswer, biometricEnabled } = req.body;
 
-      res.status(201).json({ message: 'Utilisateur inscrit avec succès', user: newUser });
+  if (!name || !pin || !securityAnswer || pin.length !== 4 || !/^\d+$/.test(pin)) {
+    return res.status(400).json({ message: 'Nom, PIN (4 chiffres), et réponse requis' });
+  }
+
+  try {
+    const existingUser = await User.findOne({ name });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Utilisateur déjà existant' });
+    }
+
+    const user = new User({ name, pin, securityAnswer, biometricEnabled });
+    await user.save();
+
+    const token = jwt.sign({ id: user._id }, jwtConfig.secret, { expiresIn: jwtConfig.expiresIn });
+    res.status(201).json({ token, message: 'Utilisateur enregistré' });
   } catch (error) {
-      res.status(500).json({ message: "Erreur lors de l'inscription", error: error.message });
+    res.status(500).json({ message: 'Erreur serveur', error });
   }
 };
 
-// Connexion avec PIN / Face ID / Touch ID
 exports.login = async (req, res) => {
+  const { name, pin } = req.body;
+
   try {
-    const { pin, biometricType } = req.body;
-
-    // Rechercher l'utilisateur
-    const user = await User.findOne({ $or: [{ pin }, { faceIdEnabled: biometricType === 'FaceID' }, { touchIdEnabled: biometricType === 'TouchID' }] });
-
-    if (!user) {
-      return res.status(400).json({ message: "Utilisateur non trouvé ou méthode biométrique invalide" });
+    const user = await User.findOne({ name });
+    if (!user || !(await bcrypt.compare(pin, user.pin))) {
+      return res.status(401).json({ message: 'Nom ou PIN incorrect' });
     }
 
-    let isAuthenticated = false;
-    if (pin) {
-      // Vérifier le PIN
-      isAuthenticated = await bcrypt.compare(pin, user.pin);
-    } else if (biometricType === 'FaceID' && user.faceIdEnabled) {
-      isAuthenticated = true;
-    } else if (biometricType === 'TouchID' && user.touchIdEnabled) {
-      isAuthenticated = true;
-    }
-
-    if (!isAuthenticated) {
-      return res.status(400).json({ message: "Identifiants invalides" });
-    }
-
-    // Générer un token JWT
-    const token = jwt.sign({ userId: user._id }, "secretkey", { expiresIn: '1h' });
-    res.json({ message: "Connexion réussie", token });
+    const token = jwt.sign({ id: user._id }, jwtConfig.secret, { expiresIn: jwtConfig.expiresIn });
+    res.json({ token, biometricEnabled: user.biometricEnabled });
   } catch (error) {
-    res.status(500).json({ message: "Erreur lors de la connexion", error: error.message });
+    res.status(500).json({ message: 'Erreur serveur', error });
   }
 };
 
-// Réinitialisation du PIN avec la question de sécurité
-exports.resetPinWithSecurityQuestion = async (req, res) => {
+exports.resetPin = async (req, res) => {
+  const { name, securityAnswer, newPin } = req.body;
+
+  if (!name || !securityAnswer || !newPin || newPin.length !== 4 || !/^\d+$/.test(newPin)) {
+    return res.status(400).json({ message: 'Nom, réponse, et nouveau PIN (4 chiffres) requis' });
+  }
+
   try {
-    const { userId, securityAnswer, newPin } = req.body;
-
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    const user = await User.findOne({ name });
+    if (!user || !(await bcrypt.compare(securityAnswer, user.securityAnswer))) {
+      return res.status(401).json({ message: 'Nom ou réponse incorrecte' });
     }
 
-    const isAnswerCorrect = await bcrypt.compare(securityAnswer.toLowerCase(), user.securityAnswer);
-    if (!isAnswerCorrect) {
-      return res.status(400).json({ message: "Réponse incorrecte" });
-    }
-
-    const hashedNewPin = await bcrypt.hash(newPin, 10);
-    user.pin = hashedNewPin;
+    user.pin = newPin;
     await user.save();
-
-    res.status(200).json({ message: "PIN réinitialisé avec succès" });
+    res.json({ message: 'PIN réinitialisé avec succès' });
   } catch (error) {
-    res.status(500).json({ message: "Erreur lors de la réinitialisation du PIN", error: error.message });
-  }
-};
-
-// Réinitialisation du PIN avec Face ID / Touch ID
-exports.resetPinWithBiometrics = async (req, res) => {
-  try {
-    const { userId, biometricType, newPin } = req.body;
-
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "Utilisateur non trouvé" });
-    }
-
-    if (
-      (biometricType === "FaceID" && !user.faceIdEnabled) ||
-      (biometricType === "TouchID" && !user.touchIdEnabled)
-    ) {
-      return res.status(400).json({ message: "Méthode biométrique non activée" });
-    }
-
-    const hashedNewPin = await bcrypt.hash(newPin, 10);
-    user.pin = hashedNewPin;
-    await user.save();
-
-    res.status(200).json({ message: "PIN réinitialisé avec succès" });
-  } catch (error) {
-    res.status(500).json({ message: "Erreur lors de la réinitialisation du PIN", error: error.message });
-  }
-};
-
-// Récupérer tous les utilisateurs
-exports.getUsers = async (req, res) => {
-  try {
-    const users = await User.find();
-    res.status(200).json(users);
-  } catch (error) {
-    res.status(500).json({ message: "Erreur lors de la récupération des utilisateurs", error: error.message });
-  }
-};
-
-// Supprimer un utilisateur
-exports.deleteUser = async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const user = await User.findByIdAndDelete(userId);
-
-    if (!user) {
-      return res.status(404).json({ message: "Utilisateur non trouvé" });
-    }
-
-    res.status(200).json({ message: "Utilisateur supprimé avec succès" });
-  } catch (error) {
-    res.status(500).json({ message: "Erreur lors de la suppression de l'utilisateur", error: error.message });
+    res.status(500).json({ message: 'Erreur serveur', error });
   }
 };

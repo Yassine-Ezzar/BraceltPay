@@ -1,61 +1,42 @@
-### Inscription avec PIN
+# Enregistrement d'un utilisateur
 POST http://localhost:3000/api/auth/register
 Content-Type: application/json
 
 {
-  "pinCode": "1234",
-  "securityQuestion": "Quel est le nom de votre premier animal ?",
+  "name": "Alice",
+  "pin": "1234",
   "securityAnswer": "Rex",
-  "faceIdEnabled": true,
-  "touchIdEnabled": false
+  "biometricEnabled": true
 }
 
-### Connexion avec PIN
+###
+
+# Connexion avec PIN
 POST http://localhost:3000/api/auth/login
 Content-Type: application/json
 
 {
+  "name": "Alice",
   "pin": "1234"
 }
 
-### Connexion avec Face ID
-POST http://localhost:3000/api/auth/login
+###
+
+# Réinitialisation du PIN
+POST http://localhost:3000/api/auth/reset-pin
 Content-Type: application/json
 
 {
-  "biometricType": "FaceID"
-}
-
-### Réinitialisation du PIN avec la question de sécurité
-POST http://localhost:3000/api/auth/reset-pin/security-question
-Content-Type: application/json
-
-{
-  "userId": "USER_ID_HERE",
+  "name": "Alice",
   "securityAnswer": "Rex",
   "newPin": "5678"
 }
-
-### Réinitialisation du PIN avec Face ID
-POST http://localhost:3000/api/auth/reset-pin/biometrics
-Content-Type: application/json
-
-{
-  "userId": "USER_ID_HERE",
-  "biometricType": "FaceID",
-  "newPin": "5678"
-}
-
-### Récupérer tous les utilisateurs
-GET http://localhost:3000/api/auth/users
-
-### Supprimer un utilisateur
-DELETE http://localhost:3000/api/auth/users/USER_ID_HERE
 
 ********************************************************************************
 ### Ajouter une carte
 POST http://localhost:3000/api/wallet/add-card
 Content-Type: application/json
+Authorization: Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDAxNmEwZTE2MTg5ZTcyOTNkNjE1ZSIsImlhdCI6MTc0MTY5MzUzMiwiZXhwIjoxNzQ0Mjg1NTMyfQ.w0LzKmhkcs5UU0rwWA6XaJu3dNhSMzWpW3TrsO2kz-M>
 
 {
   "cardNumber": "1234567812345678",
@@ -66,19 +47,19 @@ Content-Type: application/json
 
 ### Récupérer toutes les cartes
 GET http://localhost:3000/api/wallet/cards
+Authorization: Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDAxNmEwZTE2MTg5ZTcyOTNkNjE1ZSIsImlhdCI6MTc0MTY5MzUzMiwiZXhwIjoxNzQ0Mjg1NTMyfQ.w0LzKmhkcs5UU0rwWA6XaJu3dNhSMzWpW3TrsO2kz-M>
 
 ### Supprimer une carte
-DELETE http://localhost:3000/api/wallet/delete-card/{id}
+DELETE http://localhost:3000/api/wallet/delete-card/<card_id>
+Authorization: Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDAxNmEwZTE2MTg5ZTcyOTNkNjE1ZSIsImlhdCI6MTc0MTY5MzUzMiwiZXhwIjoxNzQ0Mjg1NTMyfQ.w0LzKmhkcs5UU0rwWA6XaJu3dNhSMzWpW3TrsO2kz-M>
 
-### Get Transaction History
-GET http://localhost:3000/api/transactions/history
-
-### Scanner une carte (Simulation OCR)
-POST http://localhost:3000/cards/scan
+### Scanner une carte
+POST http://localhost:3000/api/wallet/scan
 Content-Type: application/json
+Authorization: Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDAxNmEwZTE2MTg5ZTcyOTNkNjE1ZSIsImlhdCI6MTc0MTY5MzUzMiwiZXhwIjoxNzQ0Mjg1NTMyfQ.w0LzKmhkcs5UU0rwWA6XaJu3dNhSMzWpW3TrsO2kz-M>
 
 {
-  "image": "base64_encoded_image_here"
+  "image": "<base64_encoded_image>"
 }
 
 ### Effectuer un paiement
@@ -93,6 +74,8 @@ Content-Type: application/json
   "merchant": "Amazon"
 }
 
+### Get Transaction History
+GET http://localhost:3000/api/transactions/history
 ### Consulter l’historique des transactions
 GET http://localhost:3000/payments/history?userId=USER_ID_TEST
 ### Mettre à jour la localisation
