@@ -1,5 +1,5 @@
 # Enregistrement d'un utilisateur
-POST http://localhost:3000/api/auth/register
+POST http://localhost:6000/api/auth/register
 Content-Type: application/json
 
 {
@@ -12,7 +12,7 @@ Content-Type: application/json
 ###
 
 # Connexion avec PIN
-POST http://localhost:3000/api/auth/login
+POST http://localhost:6000/api/auth/login
 Content-Type: application/json
 
 {
@@ -23,7 +23,7 @@ Content-Type: application/json
 ###
 
 # Réinitialisation du PIN
-POST http://localhost:3000/api/auth/reset-pin
+POST http://localhost:6000/api/auth/reset-pin
 Content-Type: application/json
 
 {
@@ -33,37 +33,29 @@ Content-Type: application/json
 }
 
 ********************************************************************************
-### Ajouter une carte
-POST http://localhost:3000/api/wallet/add-card
+# Ajouter une carte
+POST http://localhost:6000/api/cards/add
 Content-Type: application/json
-Authorization: Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDAxNmEwZTE2MTg5ZTcyOTNkNjE1ZSIsImlhdCI6MTc0MTY5MzUzMiwiZXhwIjoxNzQ0Mjg1NTMyfQ.w0LzKmhkcs5UU0rwWA6XaJu3dNhSMzWpW3TrsO2kz-M>
 
 {
-  "cardNumber": "1234567812345678",
-  "expiryDate": "12/26",
-  "cvv": "123",
-  "cardholderName": "John Doe"
+  "userId": "your-user-id-here",
+  "cardNumber": "1234567890123456",
+  "expiryDate": "12/25",
+  "cvv": "123"
 }
 
-### Récupérer toutes les cartes
-GET http://localhost:3000/api/wallet/cards
-Authorization: Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDAxNmEwZTE2MTg5ZTcyOTNkNjE1ZSIsImlhdCI6MTc0MTY5MzUzMiwiZXhwIjoxNzQ0Mjg1NTMyfQ.w0LzKmhkcs5UU0rwWA6XaJu3dNhSMzWpW3TrsO2kz-M>
+###
 
-### Supprimer une carte
-DELETE http://localhost:3000/api/wallet/delete-card/<card_id>
-Authorization: Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDAxNmEwZTE2MTg5ZTcyOTNkNjE1ZSIsImlhdCI6MTc0MTY5MzUzMiwiZXhwIjoxNzQ0Mjg1NTMyfQ.w0LzKmhkcs5UU0rwWA6XaJu3dNhSMzWpW3TrsO2kz-M>
+# Récupérer toutes les cartes d’un utilisateur
+GET http://localhost:6000/api/cards?userId=your-user-id-here
 
-### Scanner une carte
-POST http://localhost:3000/api/wallet/scan
-Content-Type: application/json
-Authorization: Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDAxNmEwZTE2MTg5ZTcyOTNkNjE1ZSIsImlhdCI6MTc0MTY5MzUzMiwiZXhwIjoxNzQ0Mjg1NTMyfQ.w0LzKmhkcs5UU0rwWA6XaJu3dNhSMzWpW3TrsO2kz-M>
+###
 
-{
-  "image": "<base64_encoded_image>"
-}
+# Supprimer une carte
+DELETE http://localhost:6000/api/cards/your-card-id-here
 
 ### Effectuer un paiement
-POST http://localhost:3000/payments/transaction
+POST http://localhost:6000/payments/transaction
 Content-Type: application/json
 
 {
@@ -75,11 +67,11 @@ Content-Type: application/json
 }
 
 ### Get Transaction History
-GET http://localhost:3000/api/transactions/history
+GET http://localhost:6000/api/transactions/history
 ### Consulter l’historique des transactions
-GET http://localhost:3000/payments/history?userId=USER_ID_TEST
+GET http://localhost:6000/payments/history?userId=USER_ID_TEST
 ### Mettre à jour la localisation
-POST http://localhost:3000/location/update
+POST http://localhost:6000/location/update
 Content-Type: application/json
 
 {
@@ -89,4 +81,4 @@ Content-Type: application/json
 }
 
 ### Obtenir la localisation
-GET http://localhost:3000/location/get?userId=USER_ID_TEST
+GET http://localhost:6000/location/get?userId=USER_ID_TEST

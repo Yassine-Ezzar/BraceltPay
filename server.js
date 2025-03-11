@@ -5,7 +5,7 @@ const cors = require("cors");
 const morgan = require("morgan");
 const helmet = require("helmet");
 const authRoutes = require('./routes/authRoutes');
-const walletRoutes = require('./routes/walletRoutes');
+const cardRoutes = require('./routes/cardRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const locationRoutes = require('./routes/locationRoutes');
@@ -19,7 +19,7 @@ app.use(morgan("dev"));
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/wallet', walletRoutes);
+app.use('/api/cards', cardRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/payments', paymentRoutes);
 app.use('/location', locationRoutes);
@@ -27,5 +27,5 @@ app.use('/location', locationRoutes);
 mongoose.connect(process.env.MONGO_URI).then(() => console.log("MongoDB connecté ✅")).catch(err => console.error(err));
 
 // Serveur
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 6000;
 app.listen(PORT, () => console.log(`🚀 Serveur sur http://localhost:${PORT}`));

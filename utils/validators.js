@@ -1,26 +1,19 @@
-exports.validateCard = (cardNumber, expiryDate, cvv) => {
-    // Valider le numéro de carte (Luhn Algorithm)
-    const luhnCheck = (num) => {
-      let sum = 0;
-      for (let i = 0; i < num.length; i++) {
-        let digit = parseInt(num[i]);
-        if ((num.length - i) % 2 === 0) {
-          digit *= 2;
-          if (digit > 9) digit -= 9;
-        }
-        sum += digit;
-      }
-      return sum % 10 === 0;
-    };
-  
-    // Valider la date d'expiration
-    const [month, year] = expiryDate.split('/');
+const validateCard = {
+  cardNumber: (number) => {
+    const regex = /^\d{16}$/; 
+    return regex.test(number.replace(/\s/g, '')); 
+  },
+  expiryDate: (date) => {
+    const regex = /^(0[1-9]|1[0-2])\/\d{2}$/; 
+    if (!regex.test(date)) return false;
+    const [month, year] = date.split('/');
     const expiry = new Date(`20${year}`, month - 1);
-    const now = new Date();
-    if (expiry < now) return false;
-  
-    // Valider le CVV
-    if (cvv.length !== 3 && cvv.length !== 4) return false;
-  
-    return luhnCheck(cardNumber);
-  };
+    return expiry > new Date();
+  },
+  cvv: (cvv) => {
+    const regex = /^\d{3,4}$/; 
+    return regex.test(cvv);
+  },
+};
+
+module.exports = validateCard;
